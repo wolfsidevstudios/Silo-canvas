@@ -1,0 +1,5 @@
+{
+  "name": "Animation Studio",
+  "description": "A simple web-based animation application where users can draw frame-by-frame animations. It features basic drawing tools, frame management, and a playback preview.",
+  "requestFramePermissions": []
+}
