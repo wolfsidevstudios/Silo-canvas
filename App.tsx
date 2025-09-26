@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import Canvas from './components/Canvas';
 import Toolbar from './components/Toolbar';
@@ -80,6 +79,8 @@ const App: React.FC = () => {
         canvasRef.current?.clear();
     }, []);
     
+    const onionSkinImage = currentFrameIndex > 0 ? frames[currentFrameIndex - 1] : undefined;
+
     return (
         <div className="bg-gray-100 min-h-screen w-screen flex flex-col font-sans">
             <header className="w-full flex justify-center p-3 sm:p-4 sticky top-0 bg-gray-100/80 backdrop-blur-sm z-20">
@@ -116,6 +117,7 @@ const App: React.FC = () => {
                             brushSize={brushSize}
                             isErasing={isErasing}
                             imageToLoad={frames[currentFrameIndex]}
+                            onionSkinImage={onionSkinImage}
                             onDrawEnd={handleDrawEnd}
                         />
                     </div>

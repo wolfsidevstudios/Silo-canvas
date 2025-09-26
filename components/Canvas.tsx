@@ -1,4 +1,3 @@
-
 import React, { useRef, useEffect, useState, forwardRef, useImperativeHandle } from 'react';
 
 interface CanvasProps {
@@ -8,6 +7,7 @@ interface CanvasProps {
     brushSize: number;
     isErasing: boolean;
     imageToLoad?: string;
+    onionSkinImage?: string;
     onDrawEnd: (dataUrl: string) => void;
 }
 
@@ -22,9 +22,11 @@ const Canvas = forwardRef<CanvasHandle, CanvasProps>(({
     brushSize,
     isErasing,
     imageToLoad,
+    onionSkinImage,
     onDrawEnd,
 }, ref) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
+    const onionCanvasRef = useRef<HTMLCanvasElement>(null);
     const contextRef = useRef<CanvasRenderingContext2D | null>(null);
     const [isDrawing, setIsDrawing] = useState(false);
 
@@ -46,6 +48,23 @@ const Canvas = forwardRef<CanvasHandle, CanvasProps>(({
             context.drawImage(image, 0, 0, width, height);
         };
     }, [imageToLoad, width, height]);
+
+    useEffect(() => {
+        const onionCanvas = onionCanvasRef.current;
+        if (!onionCanvas) return;
+        const onionContext = onionCanvas.getContext('2d');
+        if (!onionContext) return;
+
+        onionContext.clearRect(0, 0, width, height);
+
+        if (onionSkinImage) {
+            const image = new Image();
+            image.src = onionSkinImage;
+            image.onload = () => {
+                onionContext.drawImage(image, 0, 0, width, height);
+            };
+        }
+    }, [onionSkinImage, width, height]);
 
     useImperativeHandle(ref, () => ({
         clear: () => {
@@ -131,19 +150,27 @@ const Canvas = forwardRef<CanvasHandle, CanvasProps>(({
     };
 
     return (
-        <canvas
-            ref={canvasRef}
-            width={width}
-            height={height}
-            onMouseDown={startDrawing}
-            onMouseUp={stopDrawing}
-            onMouseMove={draw}
-            onMouseLeave={stopDrawing}
-            onTouchStart={startDrawing}
-            onTouchEnd={stopDrawing}
-            onTouchMove={draw}
-            className="cursor-crosshair bg-white rounded-lg w-full h-full object-contain touch-none"
-        />
+        <div className="relative w-full h-full">
+            <canvas
+                ref={onionCanvasRef}
+                width={width}
+                height={height}
+                className="absolute top-0 left-0 w-full h-full object-contain opacity-30 pointer-events-none rounded-lg"
+            />
+            <canvas
+                ref={canvasRef}
+                width={width}
+                height={height}
+                onMouseDown={startDrawing}
+                onMouseUp={stopDrawing}
+                onMouseMove={draw}
+                onMouseLeave={stopDrawing}
+                onTouchStart={startDrawing}
+                onTouchEnd={stopDrawing}
+                onTouchMove={draw}
+                className="relative cursor-crosshair bg-transparent rounded-lg w-full h-full object-contain touch-none"
+            />
+        </div>
     );
 });
 
